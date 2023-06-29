@@ -339,11 +339,11 @@ impl Logger {
         }
     }
 
-    pub fn test_progress(&self, entry_index: usize, count: usize) {
+    pub fn test_progress(&self, entry_index: usize, count: usize, desc: &str) {
         if !self.progress_bar {
             return;
         }
-        log_test_progress(entry_index, count)
+        log_test_progress(entry_index, count, desc)
     }
 
     pub fn test_completed(&self, result: &HurlResult) {
@@ -504,9 +504,15 @@ fn log_test_running_no_color(filename: &str, current: usize, total: usize) {
     eprintln!("{filename}: Running [{current}/{total}]")
 }
 
-fn log_test_progress(entry_index: usize, count: usize) {
+fn log_test_progress(entry_index: usize, count: usize, desc: &str) {
     let progress = progress_string(entry_index, count);
-    eprint!(" {progress}\r");
+    let desc = if desc.len() > 50 {
+        let desc = &desc[0..50];
+        format!("{desc}...")
+    } else {
+        desc.to_string()
+    };
+    eprint!("\x1B[K {progress} {desc}\r");
 }
 
 /// Returns the progress string with the current entry at `entry_index`.
